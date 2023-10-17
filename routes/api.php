@@ -11,3 +11,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('cadastro', [CadastroCliente::class, 'index']);
 Route::post('cadastro', [CadastroCliente::class, 'store']);
+Route::put('cadastro/{id}', [CadastroCliente::class, 'update']);
+Route::delete('cadastro/{id}', [CadastroCliente::class, 'destroy']);
