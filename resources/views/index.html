@@ -1,93 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cadastro App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro App</title>
 </head>
+
 <body>
-<div class="container">
+    <div class="container">
         <h2>Cadastrar Usuário</h2>
-    <div>
-      <h1>Cadastros</h1>
-      <ul id="cadastros-list"></ul>
+        <div>
+            <h1>Cadastros</h1>
+            <ul id="cadastros-list"></ul>
+        </div>
+
+        <div>
+            <h2>Novo Cadastro</h2>
+            <form id="cadastro-form">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" required>
+
+                <label for="endereco">Endereço:</label>
+                <input type="text" id="endereco" required>
+
+                <label for="cidade">Cidade:</label>
+                <input type="text" id="cidade" required>
+
+                <label for="cep">CEP:</label>
+                <input type="text" id="cep" required>
+
+                <label for="telefone">Telefone:</label>
+                <input type="text" id="telefone" required>
+
+                <button type="button" onclick="criarCadastro()">Criar Cadastro</button>
+            </form>
+        </div>
+
+        <div>
+            <h2>Cadastro Selecionado</h2>
+            <div id="cadastro-selecionado"></div>
+        </div>
     </div>
 
-    <div>
-      <h2>Novo Cadastro</h2>
-      <form id="cadastro-form">
-        <label for="nome">Nome:</label>
-        <input type="text" id="nome" required>
+    <script>
+        function criarCadastro() {
+            const nome = document.getElementById('nome').value;
+            const endereco = document.getElementById('endereco').value;
+            const cidade = document.getElementById('cidade').value;
+            const cep = document.getElementById('cep').value;
+            const telefone = document.getElementById('telefone').value;
 
-        <label for="endereco">Endereço:</label>
-        <input type="text" id="endereco" required>
+            fetch('http://127.0.0.1:8000/api/cadastro', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        nome,
+                        endereco,
+                        cidade,
+                        cep,
+                        telefone
+                    }),
+                })
+                .then(response => response.json())
+                .then(cadastro => {
+                    // Assuming cadastro is an object with a "nome" property
+                    cadastrosList.innerHTML += `<li>${cadastro.nome}</li>`;
+                    cadastroForm.reset();
+                })
+                .catch(error => console.error(error));
+        }
 
-        <label for="cidade">Cidade:</label>
-        <input type="text" id="cidade" required>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cadastrosList = document.getElementById('cadastros-list');
+            const cadastroForm = document.getElementById('cadastro-form');
+            const cadastroSelecionado = document.getElementById('cadastro-selecionado');
 
-        <label for="cep">CEP:</label>
-        <input type="text" id="cep" required>
+            function carregarCadastros() {
+                fetch('http://127.0.0.1:8000/api/cadastro')
+                    .then(response => response.json())
+                    .then(cadastros => {
+                        cadastrosList.innerHTML = cadastros.map(cadastro => `<li>${cadastro.nome}</li> <li>${cadastro.public_key}</li>`).join('');
+                    })
+                    .catch(error => console.error(error));
+            }
 
-        <label for="telefone">Telefone:</label>
-        <input type="text" id="telefone" required>
-
-        <button type="button" onclick="criarCadastro()">Criar Cadastro</button>
-      </form>
-    </div>
-
-    <div>
-      <h2>Cadastro Selecionado</h2>
-      <div id="cadastro-selecionado"></div>
-    </div>
-  </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const cadastrosList = document.getElementById('cadastros-list');
-      const cadastroForm = document.getElementById('cadastro-form');
-      const cadastroSelecionado = document.getElementById('cadastro-selecionado');
-
-      function carregarCadastros() {
-        fetch('http://127.0.0.1:8000/api/cadastro')
-          .then(response => response.json())
-          .then(cadastros => {
-            cadastrosList.innerHTML = cadastros.map(cadastro => `<li>${cadastro.nome}</li> <li>${cadastro.public_key}</li> <li>${cadastro.private_key}</li>`).join('');
-          })
-          .catch(error => console.error(error));
-      }
-
-      function criarCadastro() {
-        const nome = document.getElementById('nome').value;
-        const endereco = document.getElementById('endereco').value;
-        const cidade = document.getElementById('cidade').value;
-        const cep = document.getElementById('cep').value;
-        const telefone = document.getElementById('telefone').value;
-
-        fetch('http://127.0.0.1:8000/api/cadastro', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            nome,
-            endereco,
-            cidade,
-            cep,
-            telefone
-          }),
-        })
-        .then(response => response.json())
-        .then(cadastro => {
-          // Assuming cadastro is an object with a "nome" property
-          cadastrosList.innerHTML += `<li>${cadastro.nome}</li>`;
-          cadastroForm.reset();
-        })
-        .catch(error => console.error(error));
-      }
-
-      // Call the initial data load
-      carregarCadastros();
-    });
-  </script>
+            // Call the initial data load
+            carregarCadastros();
+        });
+    </script>
 </body>
+
 </html>
