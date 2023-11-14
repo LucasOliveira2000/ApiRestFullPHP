@@ -17,6 +17,8 @@ class Cadastro extends Model
         'cidade',
         'cep',
         'telefone',
+        'private_key',
+        'public_key',
     ];
 
 }

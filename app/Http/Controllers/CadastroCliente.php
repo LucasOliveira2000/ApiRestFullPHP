@@ -38,7 +38,29 @@ class CadastroCliente extends Controller
                 // Adicione outras mensagens conforme necessário.
             ]);
     
-            $cadastro = Cadastro::create($request->all());
+             // Criar um novo par de chaves pública e privada
+            $config = array(
+                "digest_alg" => "sha512",
+                "private_key_bits" => 4096,
+                "private_key_type" => OPENSSL_KEYTYPE_RSA,
+            );
+
+            $keyPair = openssl_pkey_new($config);
+
+            // Extrair a chave privada de $keyPair para $privateKey
+            openssl_pkey_export($keyPair, $privateKey);
+
+            // Extrair a chave pública de $keyPair para $publicKey
+            $publicKeyDetails = openssl_pkey_get_details($keyPair);
+            $publicKey = $publicKeyDetails["key"];
+
+            $cadastroData = $request->all();
+
+            // Adicionar as chaves ao array de dados antes de criar o Cadastro
+            $cadastroData['private_key'] = $privateKey;
+            $cadastroData['public_key'] = $publicKey;
+
+            $cadastro = Cadastro::create($cadastroData);
     
             return response()->json($cadastro, 201);
     
